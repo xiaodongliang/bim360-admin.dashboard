@@ -4,7 +4,7 @@ const readline = require("readline");
 const fs = require("fs");  
 const mkdir = require('mkdirp')
 
-const DELAY_MILISECOND = 1000; 
+const DELAY_MILISECOND = 500; 
 
 const SocketEnum = {
   DEMO_TOPIC: 'demo topic',

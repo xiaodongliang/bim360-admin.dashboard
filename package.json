@@ -21,6 +21,6 @@
     "node-fetch": "^2.3.0",
     "save": "^2.4.0",
     "socket.io": "^2.3.0",
-    "tiny-async-pool": "^1.1.0"
+    "tiny-async-pool": "^1.2.0"
   }
 }

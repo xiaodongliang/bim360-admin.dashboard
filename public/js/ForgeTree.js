@@ -126,11 +126,11 @@ function prepareUserHubsTree() {
           user_table_view.resetData()
 
 
-          //await user_table_view.getAccountUsers(accountId_without_b)
-          await user_table_view.getAllProjectsUsers(accountId_without_b)  
+          await user_table_view.getAccountUsers(accountId_without_b)
+          //await user_table_view.getAllProjectsUsers(accountId_without_b)  
 
-          //$('#progress_accountUsers').show();
-          $('#progress_projectUsers').show();
+          $('#progress_accountUsers').show();
+          //$('#progress_projectUsers').show();
 
 
         })(href)

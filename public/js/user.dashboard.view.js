@@ -22,8 +22,9 @@ class UserDashboardView {
           data_map[u.company_name] = 1
       });
     }else{
-      // users by projects number
-    }
+        //project users by what ...?
+        //..... ????   
+   }
 
     for (var d in data_map) {
       labels.push(d);
@@ -78,7 +79,7 @@ class UserDashboardView {
     var labels = [], data_map = {}, dataTotals = [], colors = [];
 
     if (isAccountUser) {
-    // account user by country 
+    // account user by country
 
       userData.forEach(async u => {
         if (u.country in data_map)
@@ -87,8 +88,8 @@ class UserDashboardView {
           data_map[u.country] = 1
       }); 
   }else{
-    //project users by ...what?
-
+    //project users by what ...?
+    //..... ????
   }
     for (var d in data_map) {
       labels.push(d);

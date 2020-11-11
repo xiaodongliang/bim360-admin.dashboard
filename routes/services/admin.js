@@ -22,6 +22,8 @@ const config = require('../../config');
 //We may only need GET when exporting records
 const { get } = require('./fetch_common');
 const utility = require('../utility');
+const asyncPool = require('tiny-async-pool')
+const { chunk } =  require('lodash');
 
 //export BIM 360 projects, recursive function
 async function exportProjects(accountid, limit, offset, allProjects,pageIndex) {
@@ -97,7 +99,7 @@ async function exportAllProjectUsers(accountId){
     });
 
     console.log('start getting project users');
-    Promise.all(promiseArr).then((resultsArray) => {
+    return await Promise.all(promiseArr).then((resultsArray) => {
         console.log('getting project users done:');
         const allUsers = utility.flatDeep(resultsArray,Infinity)
         return allUsers
@@ -127,9 +129,11 @@ async function exportProjectsUsers(accountid, projectId, projectName, limit, off
     } else {
 
       //now, sort it out with the explicit data of company name, access level, and accessible services of this user
-      let promiseArr = allUsers.map(async (u, index) => {
+      var promiseCreator = async (u) => {
+
+      //let promiseArr = allUsers.map(async (u, index) => {
         //must delay to avoid to hit rate limit
-        await utility.delay(index * utility.DELAY_MILISECOND*2)
+        await utility.delay(utility.DELAY_MILISECOND)
 
         var eachUser = {}
         eachUser.name = u.name
@@ -162,15 +166,17 @@ async function exportProjectsUsers(accountid, projectId, projectName, limit, off
           eachUser.services_insight = service_index > -1 ? u.services[service_index].access : 'none'
         }
         return eachUser;
-      });
+      }//);
 
-      return Promise.all(promiseArr).then((resultsArray) => {
-        resultsArray = utility.flatDeep(resultsArray,Infinity)
-        return resultsArray;
-      }).catch(function (err) { 
-        console.log(`exception when Promise.all sorting out users: ${err}`);
-        return []
-      })
+      var res = await asyncPool(2, allUsers, promiseCreator);  
+      return res; 
+      // return Promise.all(promiseArr).then((resultsArray) => {
+      //   resultsArray = utility.flatDeep(resultsArray,Infinity)
+      //   return resultsArray;
+      // }).catch(function (err) { 
+      //   console.log(`exception when Promise.all sorting out users: ${err}`);
+      //   return []
+      // })
     }
   } catch (e) {
     console.error(`exportProjectsUsers ${projectName} failed: ${e}`)
