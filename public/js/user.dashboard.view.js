@@ -9,22 +9,26 @@ class UserDashboardView {
   }
 
 
-  refresh_stat_one(userData, isAccountUser) {
-
-    var labels = [], data_map = {}, dataTotals = [], colors = [];
+  refresh_stat_one(userData, isAccountUser,filter) {
+     var labels = [], data_map = {}, dataTotals = [], colors = [];
 
     if (isAccountUser) {
       // account user by company 
       userData.forEach(async u => {
         if (u.company_name in data_map)
-          data_map[u.company_name]++
+          data_map[u.filter]++
         else
           data_map[u.company_name] = 1
       });
     }else{
         //project users by what ...?
-        //..... ????   
-   }
+        userData.forEach(async u => {
+          if (u.company in data_map)
+            data_map[u.company]++
+          else
+            data_map[u.company] = 1
+        });
+      }
 
     for (var d in data_map) {
       labels.push(d);
@@ -89,8 +93,13 @@ class UserDashboardView {
       }); 
   }else{
     //project users by what ...?
-    //..... ????
-  }
+    userData.forEach(async u => {
+      if (u.accessLevels_projectAdmin in data_map)
+        data_map[u.accessLevels_projectAdmin]++
+      else
+        data_map[u.accessLevels_projectAdmin] = 1
+    }); 
+    }
     for (var d in data_map) {
       labels.push(d);
       dataTotals.push(data_map[d]);

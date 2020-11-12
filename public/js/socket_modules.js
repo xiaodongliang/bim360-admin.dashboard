@@ -38,12 +38,8 @@ socketio.on(SocketEnum.DEMO_TOPIC, async (d) => {
         //render table and dashboard
         user_table_view._data.allProjectsUsersTable = data
         user_table_view.refreshTable('allProjectsUsersTable')
-
-        //any dashboards to render?
-        //..... 
-
-        //user_dashboard_view.refresh_stat_one(data,false)
-        //user_dashboard_view.refresh_stat_two(data,false)
+        user_dashboard_view.refresh_stat_one(data,false)
+        user_dashboard_view.refresh_stat_two(data,false) 
       } 
 
        console.log('export all project users  done') 

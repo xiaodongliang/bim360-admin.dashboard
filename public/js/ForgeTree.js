@@ -122,15 +122,13 @@ function prepareUserHubsTree() {
           const accountId_without_b = accountId.split('b.')[1]
           //const projectId_without_b = projectId.split('b.')[1] 
           user_table_view.initTable('accountUsersTable')
-          user_table_view.initTable('allProjectsUsersTable') 
-          user_table_view.resetData()
+          //user_table_view.initTable('allProjectsUsersTable') 
+          //user_table_view.resetData()
 
 
           await user_table_view.getAccountUsers(accountId_without_b)
-          //await user_table_view.getAllProjectsUsers(accountId_without_b)  
 
           $('#progress_accountUsers').show();
-          //$('#progress_projectUsers').show();
 
 
         })(href)
@@ -139,6 +137,23 @@ function prepareUserHubsTree() {
     
     if (data != null && data.node != null && (data.node.type == 'bim360projects' )) {
         //when one project is clicked
+       
+        var href = data.node.id;
+
+        (async (href)=>{ 
+          const accountId = href.split('/')[6]
+          const projectId = href.split('/')[8] 
+          const accountId_without_b = accountId.split('b.')[1]
+          const projectId_without_b = projectId.split('b.')[1] 
+          user_table_view.initTable('allProjectsUsersTable')  
+
+          await user_table_view.getAllProjectsUsers(accountId_without_b,projectId_without_b)  
+
+           $('#progress_projectUsers').show();
+
+
+        })(href)
+
 
     } 
   }); 

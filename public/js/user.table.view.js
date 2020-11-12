@@ -6,7 +6,7 @@ class UserTableView {
 
     this._data ={
       accountUsersTable:[], 
-      allProjectsUsersTable:[] 
+      allProjectsUsersTable:[]  
     } 
 
     this._tableFixComlumns = {
@@ -30,7 +30,7 @@ class UserTableView {
 
       allProjectsUsersTable: function () {
         return [
-          { field: 'project', title: "project", align: 'center' },
+          //{ field: 'project', title: "project", align: 'center' },
 
           { field: 'id', title: "id", align: 'center' },
           { field: 'name', title: "name", align: 'center' },
@@ -64,6 +64,7 @@ class UserTableView {
   }
  
   initTable(domId,isRaw) {
+
     $(`#${domId}`).bootstrapTable('destroy');
     const columns  = this._tableFixComlumns[domId](isRaw)
     $(`#${domId}`).bootstrapTable({
@@ -89,6 +90,7 @@ class UserTableView {
   } 
 
   async refreshTable(domId) {
+     
     $(`#${domId}`).bootstrapTable('destroy'); 
 
     var fixCols = this._tableFixComlumns[domId]() 
@@ -131,11 +133,11 @@ class UserTableView {
     })
   } 
 
-  async getAllProjectsUsers(accountId) {
+  async getAllProjectsUsers(accountId,projectId) {
     var _this = this
     return new Promise((resolve, reject) => {
       $.ajax({
-        url: `/api/forge/admin/allProjectUsers/${accountId}`,
+        url: `/api/forge/admin/projectUsers/${accountId}/${projectId}`,
         type: 'GET',
         success: (data) => {
           //post request, the extraction will start to run on server side

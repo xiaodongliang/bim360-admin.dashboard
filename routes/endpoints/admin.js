@@ -64,8 +64,10 @@ router.get('/admin/accountUsers/:accountId', async (req, res) => {
     
 });
 
-router.get('/admin/allProjectUsers/:accountId', async (req, res) => {
+router.get('/admin/projectUsers/:accountId/:projectId', async (req, res) => {
     const accountId = req.params['accountId']
+    const projectId = req.params['projectId']
+
     const limit = 100 // 100 records one page   
     //tell the client ok
     res.status(200).end()
@@ -73,7 +75,7 @@ router.get('/admin/allProjectUsers/:accountId', async (req, res) => {
 
     //start to extract from first page
     var allProjectsUsers = []
-    allProjectsUsers = await admin_services.exportAllProjectUsers(accountId);
+    allProjectsUsers = await admin_services.exportProjectsUsers(accountId,projectId,'',20,0,allProjectsUsers,0);
 
     //notify the client with the data
     //better store the data to server database or file, and client side downloads it
