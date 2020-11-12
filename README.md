@@ -32,7 +32,7 @@ Install [NodeJS](https://nodejs.org), version 8 or newer.
 
 Clone this project or download it (this `nodejs` branch only). It's recommended to install [GitHub desktop](https://desktop.github.com/). To clone it via command line, use the following (**Terminal** on MacOSX/Linux, **Git Shell** on Windows):
 
-    git clone https://github.com/xiaodongliang/forge-bim360.asset.exchange.excel
+    git clone https://github.com/xiaodongliang/bim360-admin.dashboard
 
 Install the required packages using `npm install`.
 
@@ -69,3 +69,4 @@ OR, set enviroment variables of [launch.json](/.vscode/launch.json) for debuggin
 2. After user logging, select a hub(account) node in the three. The code will start extracting the accounts users and all project. After it is done, the table views will list the users data. Two pie charts are produced based on account users data. you can also modify the function refresh_stat_one and refresh_stat_two of [user.dashboard.view.js](./public/js/user.dashboard.view.js) to produce the chart you need.
 
 3. if you need to produce charts based on project users data, enable the two lines of 45,46, [socket_modules.js](./public/js/socket_modules.js). and in the functions refresh_stat_one and refresh_stat_two, decide what stats you want to produce. [user.dashboard.view.js](./public/js/user.dashboard.view.js).
+
