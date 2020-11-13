@@ -21,8 +21,12 @@ socketio.on(SocketEnum.DEMO_TOPIC, async (d) => {
         //render table and dashboard  
          user_table_view._data.accountUsersTable = data
          user_table_view.refreshTable('accountUsersTable')
-         user_dashboard_view.refresh_stat_one(data,true)
-         user_dashboard_view.refresh_stat_two(data,true)
+
+         user_dashboard_view.destoryAllViews()
+         user_dashboard_view.refresh_stat_one(data,
+            {title:'User by Company',property:'company_name',type:'pie'})
+         user_dashboard_view.refresh_stat_two(data,
+            {title:'User by Country',property:'country',type:'pie'})
 
       } 
       $('#progress_accountUsers').hide(); 
@@ -38,8 +42,12 @@ socketio.on(SocketEnum.DEMO_TOPIC, async (d) => {
         //render table and dashboard
         user_table_view._data.allProjectsUsersTable = data
         user_table_view.refreshTable('allProjectsUsersTable')
-        user_dashboard_view.refresh_stat_one(data,false)
-        user_dashboard_view.refresh_stat_two(data,false) 
+
+        user_dashboard_view.destoryAllViews()
+        user_dashboard_view.refresh_stat_one(data,
+           {title:'User by Company',property:'company',type:'pie'})
+        user_dashboard_view.refresh_stat_two(data,
+           {title:'Users as Project Admin',property:'accessLevels_projectAdmin',type:'pie'})
       } 
 
        console.log('export all project users  done') 

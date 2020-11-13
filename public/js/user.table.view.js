@@ -16,13 +16,14 @@ class UserTableView {
           { field: 'id', title: "id", align: 'center' },
           { field: 'name', title: "name", align: 'center' },
           { field: 'role', title: "role", align: 'center' },
-          { field: 'company_name', title: "company_name", align: 'left' },
-          { field: 'website_url', title: "website_url", align: 'left' },
-          { field: 'last_sign_in', title: "last_sign_in", align: 'center' },
-          { field: 'email', title: "email", align: 'left' },
-          { field: 'uid', title: "uid", align: 'left' },
-          { field: 'city', title: "city", align: 'left' },
           { field: 'country', title: "country", align: 'center' },
+          { field: 'company_name', title: "company_name", align: 'left' },
+          { field: 'email', title: "email", align: 'left' },
+          { field: 'last_sign_in', title: "last_sign_in", align: 'center' },
+          { field: 'city', title: "city", align: 'left' }, 
+          { field: 'uid', title: "uid", align: 'left' },
+          { field: 'website_url', title: "website_url", align: 'left' },
+
           { field: 'created_at', title: "created_at", align: 'left' },
           { field: 'job_title', title: "job_title", align: 'left' }  
           ]

@@ -4,31 +4,31 @@ class UserDashboardView {
 
     this._data = {
       stat_one: [],
-      stat_two: []
+      stat_two: [] 
+    }
+    this._view = {
+      stat_one_view:null,
+      stat_two_view:null
     }
   }
 
+   destoryAllViews(){
+    if(this._view.stat_one_view)
+      this._view.stat_one_view.destroy();
+    if(this._view.stat_two_view)
+      this._view.stat_two_view.destroy();
+  } 
 
-  refresh_stat_one(userData, isAccountUser,filter) {
+  refresh_stat_one(userData,config) {
+
      var labels = [], data_map = {}, dataTotals = [], colors = [];
-
-    if (isAccountUser) {
-      // account user by company 
-      userData.forEach(async u => {
-        if (u.company_name in data_map)
-          data_map[u.filter]++
-        else
-          data_map[u.company_name] = 1
-      });
-    }else{
-        //project users by what ...?
-        userData.forEach(async u => {
-          if (u.company in data_map)
-            data_map[u.company]++
-          else
-            data_map[u.company] = 1
-        });
-      }
+ 
+    userData.forEach(async u => {
+      if (u[config.property] in data_map)
+        data_map[u[config.property]]++
+      else
+        data_map[u[config.property]] = 1
+    }); 
 
     for (var d in data_map) {
       labels.push(d);
@@ -45,7 +45,7 @@ class UserDashboardView {
     };
 
     var config = {
-      type: 'pie',
+      type: config.type,
       data: chartData,
       options: {
         responsive: true,
@@ -53,7 +53,7 @@ class UserDashboardView {
 
         title: {
           display: true,
-          text: 'Users By Company'
+          text: config.title
         },
         tooltips: {
           mode: 'index',
@@ -74,32 +74,20 @@ class UserDashboardView {
 
     var canvas = document.getElementById('stat_one');
     var ctx = canvas.getContext('2d');
-    var stat_one = new Chart(ctx, config);
-    stat_one.update();
+    this._view.stat_one_view = new Chart(ctx, config);
+    this._view.stat_one_view.update();
   }
 
-  refresh_stat_two(userData, isAccountUser) {
+  refresh_stat_two(userData, config) {
 
     var labels = [], data_map = {}, dataTotals = [], colors = [];
 
-    if (isAccountUser) {
-    // account user by country
-
-      userData.forEach(async u => {
-        if (u.country in data_map)
-          data_map[u.country]++
-        else
-          data_map[u.country] = 1
-      }); 
-  }else{
-    //project users by what ...?
     userData.forEach(async u => {
-      if (u.accessLevels_projectAdmin in data_map)
-        data_map[u.accessLevels_projectAdmin]++
+      if (u[config.property] in data_map)
+        data_map[u[config.property]]++
       else
-        data_map[u.accessLevels_projectAdmin] = 1
+        data_map[u[config.property]] = 1
     }); 
-    }
     for (var d in data_map) {
       labels.push(d);
       dataTotals.push(data_map[d]);
@@ -115,7 +103,7 @@ class UserDashboardView {
     };
 
     var config = {
-      type: 'pie',
+      type: config.type,
       data: chartData,
       options: {
         responsive: true,
@@ -123,7 +111,7 @@ class UserDashboardView {
 
         title: {
           display: true,
-          text: 'Users By Country'
+          text: config.title
         },
         tooltips: {
           mode: 'index',
@@ -144,8 +132,8 @@ class UserDashboardView {
 
     var canvas = document.getElementById('stat_two');
     var ctx = canvas.getContext('2d');
-    var stat_one = new Chart(ctx, config);
-    stat_one.update();
+    this._view.stat_two_view = new Chart(ctx, config);
+    this._view.stat_two_view.update();
   }
 
   random_rgba() {
