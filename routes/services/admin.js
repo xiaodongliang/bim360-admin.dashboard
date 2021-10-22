@@ -23,7 +23,6 @@ const config = require('../../config');
 const { get } = require('./fetch_common');
 const utility = require('../utility');
 const asyncPool = require('tiny-async-pool')
-const { chunk } = require('lodash');
 
 //export BIM 360 projects, recursive function
 async function exportProjects(accountid, limit, offset, allProjects, pageIndex) {
