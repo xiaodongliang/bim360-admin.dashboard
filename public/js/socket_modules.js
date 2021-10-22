@@ -2,7 +2,9 @@
 const SocketEnum = {
   DEMO_TOPIC: 'demo topic',
   EXTRACT_ACCOUNT_USERS_DONE:'extract account users done',
-  EXTRACT_ALL_PROJECTS_USERS_DONE:'extract users of all project done' 
+  EXTRACT_PROJECT_USERS_DONE:'extract users of one project done',
+  EXTRACT_ALL_PROJECT_USERS_DONE:'extract all users of all projects done',
+
 };  
 
 socketio = io('http://localhost:3000');
@@ -32,7 +34,7 @@ socketio.on(SocketEnum.DEMO_TOPIC, async (d) => {
       $('#progress_accountUsers').hide(); 
       console.log('export one page  done')
       break;
-    case SocketEnum.EXTRACT_ALL_PROJECTS_USERS_DONE:   
+    case SocketEnum.EXTRACT_PROJECT_USERS_DONE:   
        $('#progress_projectUsers').hide(); 
      
        if(info)
@@ -50,8 +52,20 @@ socketio.on(SocketEnum.DEMO_TOPIC, async (d) => {
            {title:'Users as Project Admin',property:'accessLevels_projectAdmin',type:'pie'})
       } 
 
-       console.log('export all project users  done') 
+       console.log('export all users of one project  done') 
        break; 
+    case SocketEnum.EXTRACT_ALL_PROJECT_USERS_DONE:   
+       $('#progress_export_allusers').hide(); 
+       const accountName = data.accountName
+       if(data.success){
+           window.location = `/api/forge/admin/downloadExcel/${accountName}`; 
+       }else{
+           $.notify('Extract all users of all projects done Failed', 'warn'); 
+       }
+       console.log('extract all users of all projects done') 
+
+    break;
+    
   }
 
 })

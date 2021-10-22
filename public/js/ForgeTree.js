@@ -120,6 +120,10 @@ function prepareUserHubsTree() {
           const accountId = href.split('/')[6]
           //const projectId = herf.split('/')[8] 
           const accountId_without_b = accountId.split('b.')[1]
+          $('#labelAccountName').text(data.node.text);
+
+          $('#labelAccountId').text(accountId_without_b);
+
           //const projectId_without_b = projectId.split('b.')[1] 
           user_table_view.initTable('accountUsersTable')
           //user_table_view.initTable('allProjectsUsersTable') 
@@ -129,6 +133,7 @@ function prepareUserHubsTree() {
           await user_table_view.getAccountUsers(accountId_without_b)
 
           $('#progress_accountUsers').show();
+          //wait the response in socket_modules.js
 
 
         })(href)
@@ -144,12 +149,16 @@ function prepareUserHubsTree() {
           const accountId = href.split('/')[6]
           const projectId = href.split('/')[8] 
           const accountId_without_b = accountId.split('b.')[1]
+          $('#labelAccountName').text(''); 
+          $('#labelAccountId').text(accountId_without_b);
+
           const projectId_without_b = projectId.split('b.')[1] 
           user_table_view.initTable('allProjectsUsersTable')  
 
           await user_table_view.getAllProjectsUsers(accountId_without_b,projectId_without_b)  
 
            $('#progress_projectUsers').show();
+           //wait the response in socket_modules.js
 
 
         })(href)

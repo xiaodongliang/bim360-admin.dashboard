@@ -3,15 +3,24 @@
 const readline = require("readline");
 const fs = require("fs");  
 const mkdir = require('mkdirp')
+const Excel_Exports = './Excel_Exports/'
 
-const DELAY_MILISECOND = 500; 
+if(!fs.existsSync(Excel_Exports))
+  mkdir.mkdirp(Excel_Exports,(err)=>{if(!err)console.log('folder ./Excel_Exports/ is created')})
+  
+var DELAY_MILISECOND = 500; 
+
+function setDelay(interval){
+   DELAY_MILISECOND = interval
+}
+
 
 const SocketEnum = {
   DEMO_TOPIC: 'demo topic',
   EXTRACT_ACCOUNT_USERS_DONE:'extract account users done',
-  EXTRACT_ALL_PROJECTS_USERS_DONE:'extract users of all project done' 
+  EXTRACT_PROJECT_USERS_DONE:'extract users of one project done',
+  EXTRACT_ALL_PROJECT_USERS_DONE:'extract all users of all projects done', 
 };  
-  
 function socketNotify(topic,message,data,info){
   //notify client
   var sockketData = {message:message,data:data,info:info} 
@@ -83,5 +92,6 @@ module.exports = {
   flatDeep,
   wait, 
   socketNotify,
-  SocketEnum
+  SocketEnum,
+  setDelay
 };

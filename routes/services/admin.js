@@ -23,10 +23,10 @@ const config = require('../../config');
 const { get } = require('./fetch_common');
 const utility = require('../utility');
 const asyncPool = require('tiny-async-pool')
-const { chunk } =  require('lodash');
+const { chunk } = require('lodash');
 
 //export BIM 360 projects, recursive function
-async function exportProjects(accountid, limit, offset, allProjects,pageIndex) {
+async function exportProjects(accountid, limit, offset, allProjects, pageIndex) {
   try {
     pageIndex++
     const endpoint = `${config.httpRequest.ForgeBaseUrl}/hq/v1/accounts/${accountid}/projects?limit=${limit}&offset=${offset}`
@@ -35,8 +35,8 @@ async function exportProjects(accountid, limit, offset, allProjects,pageIndex) {
     if (response.length > 0) {
       console.log(`getting account projects ${offset} to ${offset + limit}`)
       allProjects = allProjects.concat(response);
-      await utility.delay(utility.DELAY_MILISECOND * pageIndex)  
-      return exportProjects(accountid, limit, allProjects.length, allProjects,pageIndex);
+      await utility.delay(utility.DELAY_MILISECOND * pageIndex)
+      return exportProjects(accountid, limit, allProjects.length, allProjects, pageIndex);
     } else
       return allProjects
   } catch (e) {
@@ -45,7 +45,7 @@ async function exportProjects(accountid, limit, offset, allProjects,pageIndex) {
 }
 
 //export BIM 360 account companies , recursive function
-async function exportAccountCompanies(accountid, limit, offset, allCompanies,pageIndex) {
+async function exportAccountCompanies(accountid, limit, offset, allCompanies, pageIndex) {
   try {
     pageIndex++
     const endpoint = `${config.httpRequest.ForgeBaseUrl}/hq/v1/accounts/${accountid}/companies?limit=${limit}&offset=${offset}`
@@ -54,8 +54,8 @@ async function exportAccountCompanies(accountid, limit, offset, allCompanies,pag
     if (response.length > 0) {
       console.log(`getting account companies ${offset} to ${offset + limit}`)
       allCompanies = allCompanies.concat(response);
-      await utility.delay(utility.DELAY_MILISECOND*pageIndex)  
-      return exportAccountCompanies(accountid, limit, allCompanies.length, allCompanies,pageIndex);
+      await utility.delay(utility.DELAY_MILISECOND * pageIndex)
+      return exportAccountCompanies(accountid, limit, allCompanies.length, allCompanies, pageIndex);
     } else
       return allCompanies
   } catch (e) {
@@ -64,7 +64,7 @@ async function exportAccountCompanies(accountid, limit, offset, allCompanies,pag
 }
 
 //export BIM 360 account users , recursive function
-async function exportAccountUsers(accountid, limit, offset, allUsers,pageIndex) {
+async function exportAccountUsers(accountid, limit, offset, allUsers, pageIndex) {
   try {
     pageIndex++
     const endpoint = `${config.httpRequest.ForgeBaseUrl}/hq/v1/accounts/${accountid}/users?limit=${limit}&offset=${offset}`
@@ -73,8 +73,8 @@ async function exportAccountUsers(accountid, limit, offset, allUsers,pageIndex) 
     if (response.length > 0) {
       console.log(`getting account users ${offset} to ${offset + limit}`)
       allUsers = allUsers.concat(response);
-      await utility.delay(utility.DELAY_MILISECOND*pageIndex)  
-      return exportAccountUsers(accountid, limit, allUsers.length, allUsers,pageIndex);
+      await utility.delay(utility.DELAY_MILISECOND * pageIndex)
+      return exportAccountUsers(accountid, limit, allUsers.length, allUsers, pageIndex);
     } else
       return allUsers
   } catch (e) {
@@ -82,39 +82,46 @@ async function exportAccountUsers(accountid, limit, offset, allUsers,pageIndex) 
   }
 }
 
-async function exportAllProjectUsers(accountId){
+async function exportAllUsersbyProjects(accountId) {
   try {
-    //var allProjects = [{id:'6968a5b5-5d39-43cb-b4c4-5c5a1828f8f0',name:'Forge XXX'}];
     var allProjects = [];
     var pageIndex = 0
-    allProjects = await exportProjects(accountId,100, 0, allProjects,pageIndex);
+    allProjects = await exportProjects(accountId, 100, 0, allProjects, pageIndex);
 
-    let promiseArr = allProjects.map(async (proj, index) => {
-        console.log(proj.name);
-        await utility.delay(index * utility.DELAY_MILISECOND)
-        var oneProjectUsers = [];
-        var pageIndex = 0 
-        oneProjectUsers = await exportProjectsUsers(accountId, proj.id, proj.name, 100, 0, oneProjectUsers,pageIndex);
-        return oneProjectUsers;
+    //build params of project lists (id and name)
+    const queryParams = allProjects.map((proj, index) => {
+      return {
+        accountId: accountId,
+        projectId: proj.id,
+        projectName: proj.name,
+        index: index
+      }
+    }) 
+
+    let promiseCreator = (async (param) => {
+      console.log(param.projectName);
+      //await utility.delay(param.index * utility.DELAY_MILISECOND)
+      var oneProjectUsers = [];
+      var pageIndex = 0
+      oneProjectUsers = await exportUsersInProject(accountId, param.projectId, param.projectName, 100, 0, oneProjectUsers, pageIndex);
+      return oneProjectUsers;
     });
 
-    console.log('start getting project users');
-    return await Promise.all(promiseArr).then((resultsArray) => {
-        console.log('getting project users done:');
-        const allUsers = utility.flatDeep(resultsArray,Infinity)
-        return allUsers
-    }).catch(function (err) {
-        console.log(`exception when Promise.all getBIMProjectUsers: ${err}`);
-    })
-} catch (e) {
-    console.error(`export project users list exception:${e}`)
+    console.log('start getting users of one project');
+    var res = await asyncPool(2, queryParams, promiseCreator);
+    const allUsers = utility.flatDeep(res, Infinity)
+    console.log('getting one project users done:');
+    return allUsers
+
+  } catch (e) {
+    console.error(`exportAllUsersbyProjects exception:${e}`)
     return []
-}
+  }
 }
 
 
 //export BIM 360 project users , recursive function
-async function exportProjectsUsers(accountid, projectId, projectName, limit, offset, allUsers,pageIndex) {
+async function exportUsersInProject(accountid, projectId, projectName, limit, offset, allUsers, pageIndex) {
   try {
     pageIndex++
     const endpoint = `${config.httpRequest.ForgeBaseUrl}/bim360/admin/v1/projects/${projectId}/users?limit=${limit}&offset=${offset}`
@@ -124,24 +131,32 @@ async function exportProjectsUsers(accountid, projectId, projectName, limit, off
     if (response.results && response.results.length > 0) {
       console.log(`getting project ${projectName} users ${offset} to ${offset + limit}`)
       allUsers = allUsers.concat(response.results);
-      await utility.delay(utility.DELAY_MILISECOND*pageIndex)  
-      return exportProjectsUsers(accountid, projectId, projectName, limit, allUsers.length, allUsers,pageIndex);
+      //await utility.delay(utility.DELAY_MILISECOND * pageIndex)
+      return exportUsersInProject(accountid, projectId, projectName, limit, allUsers.length, allUsers, pageIndex);
     } else {
+
+      const allProjectRoles = await exportProjectsRoles(accountid, projectId, projectName)
 
       //now, sort it out with the explicit data of company name, access level, and accessible services of this user
       var promiseCreator = async (u) => {
 
-      //let promiseArr = allUsers.map(async (u, index) => {
+        //let promiseArr = allUsers.map(async (u, index) => {
         //must delay to avoid to hit rate limit
-        await utility.delay(utility.DELAY_MILISECOND)
+        //await utility.delay(utility.DELAY_MILISECOND)
 
         var eachUser = {}
+        eachUser.project =  projectName
         eachUser.name = u.name
         eachUser.autodeskId = u.autodeskId
         eachUser.id = u.id
+        eachUser.email = u.email
 
-        eachUser.project = projectName; 
+        eachUser.jobTitle = u.jobTitle
+        eachUser.industry = u.industry
+
+        eachUser.project = projectName;
         eachUser.company = u.companyId ? await getOneCompany(accountid, u.companyId) : '';
+        //better use exportProjectsCompanies and find item from the list
 
         eachUser.accessLevels_accountAdmin = u.accessLevels.accountAdmin
         eachUser.accessLevels_projectAdmin = u.accessLevels.projectAdmin
@@ -164,19 +179,28 @@ async function exportProjectsUsers(accountid, projectId, projectName, limit, off
           eachUser.services_fieldManagement = service_index > -1 ? u.services[service_index].access : 'none'
           service_index = u.services.findIndex(ele => ele.serviceName == 'insight')
           eachUser.services_insight = service_index > -1 ? u.services[service_index].access : 'none'
+        } 
+
+        //orgnize the string of roles
+        if (u.roleIds && u.roleIds.length > 0) {
+          let roles = ''
+          u.roleIds.forEach(async (rid) => {
+            //get meaningful name of the role
+            const findRole = allProjectRoles.find(i => i.id == rid)
+            if (findRole) {
+              roles += findRole.name + '\n'
+            }
+          });
+
+          eachUser.roles = roles
+        } else {
+          eachUser.roles = null
         }
         return eachUser;
       }//);
 
-      var res = await asyncPool(2, allUsers, promiseCreator);  
-      return res; 
-      // return Promise.all(promiseArr).then((resultsArray) => {
-      //   resultsArray = utility.flatDeep(resultsArray,Infinity)
-      //   return resultsArray;
-      // }).catch(function (err) { 
-      //   console.log(`exception when Promise.all sorting out users: ${err}`);
-      //   return []
-      // })
+      var res = await asyncPool(2, allUsers, promiseCreator);
+      return res;
     }
   } catch (e) {
     console.error(`exportProjectsUsers ${projectName} failed: ${e}`)
@@ -185,7 +209,7 @@ async function exportProjectsUsers(accountid, projectId, projectName, limit, off
 }
 
 //export BIM 360 project companies , recursive function
-async function exportProjectsCompanies(accountid, projectId, projectName, limit, offset, allCompanies,pageIndex) {
+async function exportProjectsCompanies(accountid, projectId, projectName, limit, offset, allCompanies, pageIndex) {
   try {
     pageIndex++
     const endpoint = `${config.httpRequest.ForgeBaseUrl}/hq/v1/accounts/${accountid}/projects/${projectId}/companies?limit=${limit}&offset=${offset}`
@@ -195,8 +219,8 @@ async function exportProjectsCompanies(accountid, projectId, projectName, limit,
     if (response && response.length > 0) {
       console.log(`getting project ${projectName} companies ${offset} to ${offset + limit}`)
       allCompanies = allCompanies.concat(response);
-      await utility.wait(utility.DELAY_MILISECOND*index)
-      return exportProjectsCompanies(accountid, projectId, projectName, limit, allCompanies.length, allCompanies,pageIndex);
+      await utility.wait(utility.DELAY_MILISECOND * index)
+      return exportProjectsCompanies(accountid, projectId, projectName, limit, allCompanies.length, allCompanies, pageIndex);
     } else {
 
       //now, sort it out with the explicit data of company name, access level, and accessible services of this user
@@ -205,19 +229,19 @@ async function exportProjectsCompanies(accountid, projectId, projectName, limit,
         await utility.delay(index * utility.DELAY_MILISECOND)
 
         var eachCompany = {}
-        eachCompany.project = projectName; 
+        eachCompany.project = projectName;
         eachCompany.autodeskId = c.member_group_id // note: the special name for company
         eachCompany.id = c.id
         eachCompany.name = c.name
         eachCompany.city = c.city
-        eachCompany.country = c.country 
+        eachCompany.country = c.country
         return eachCompany;
       });
 
       return Promise.all(promiseArr).then((resultsArray) => {
-        resultsArray = utility.flatDeep(resultsArray,Infinity)
+        resultsArray = utility.flatDeep(resultsArray, Infinity)
         return resultsArray;
-      }).catch(function (err) { 
+      }).catch(function (err) {
         console.log(`exception when Promise.all sorting out companies: ${err}`);
         return []
       })
@@ -228,60 +252,25 @@ async function exportProjectsCompanies(accountid, projectId, projectName, limit,
   }
 }
 
-//export BIM 360 project roles , recursive function
-async function exportProjectsRoles(accountid, projectId, projectName, limit, offset, allRoles,pageIndex) {
+//export BIM 360 project roles. This endpoint does not need pagination. One call only
+async function exportProjectsRoles(accountid, projectId, projectName) {
   try {
-    pageIndex++
-    const endpoint = `${config.httpRequest.ForgeBaseUrl}/hq/v2/accounts/${accountid}/projects/${projectId}/industry_roles?limit=${limit}&offset=${offset}`
+    const endpoint = `${config.httpRequest.ForgeBaseUrl}/hq/v2/accounts/${accountid}/projects/${projectId}/industry_roles`
     const headers = config.httpRequest.httpHeaders(config.credentials.token_2legged)
     const response = await get(endpoint, headers);
 
     if (response && response.length > 0) {
-      console.log(`getting project ${projectName} roles ${offset} to ${offset + limit}`)
-      allRoles = allRoles.concat(response);
-      await utility.delay(utility.DELAY_MILISECOND*pageIndex)  
-      return exportProjectsRoles(accountid, projectId, projectName, limit, allRoles.length, allRoles,pageIndex);
+      console.log(`getting project ${projectName} roles`)
+      return response;
     } else {
-
-      //now, sort it out with the explicit data of company name, access level, and accessible services of this user
-      let promiseArr = allRoles.map(async (r, index) => {
-        //must delay to avoid to hit rate limit
-        await utility.delay(index * utility.DELAY_MILISECOND*index)
-
-        var eachRole = {}
-        eachRole.project = projectName; 
-        eachRole.autodeskId = r.member_group_id // note: the special name for company
-        eachRole.id = r.id
-        eachRole.name = r.name 
-
-        if (r.services) {
-          eachRole.services_design_collaboration = r.services.design_collaboration ? r.services.design_collaboration.access_level : 'none'
-          eachRole.services_document_management = r.services.document_management ? r.services.document_management.access_level : 'none'
-          eachRole.services_project_management = r.services.project_management ? r.services.project_management.access_level : 'none'
-          eachRole.services_insight = r.services.insight ? r.services.insight.access_level : 'none'
-          eachRole.services_model_coordination = r.services.model_coordination ? r.services.model_coordination.access_level : 'none'
-          eachRole.services_project_administration = r.services.project_administration ? r.services.project_administration.access_level : 'none'
-          eachRole.services_field_administration = r.services.field_administration ? r.services.field_administration.access_level : 'none'
-          eachRole.services_assets = r.services.assets ? r.services.assets.access_level : 'none'
-
-        }
-        return eachRole;
-      });
-
-      return Promise.all(promiseArr).then((resultsArray) => {
-        resultsArray = utility.flatDeep(resultsArray,Infinity)
-        return resultsArray;
-      }).catch(function (err) { 
-        console.log(`exception when Promise.all sorting out roles: ${err}`);
-        return []
-      })
+      return []
     }
   } catch (e) {
     console.error(`exportProjectsRoles ${projectName} failed: ${e}`)
     return []
   }
 }
- 
+
 
 //get one company data
 async function getOneCompany(accountid, companyId) {
@@ -297,16 +286,10 @@ async function getOneCompany(accountid, companyId) {
   } catch (e) {
     console.log(`getOneCompany failed: ${e}`)
   }
-} 
+}
 
 module.exports = {
-  exportProjects,
-  exportAccountCompanies,
   exportAccountUsers,
-  exportProjectsUsers,
-  exportProjectsCompanies,
-  exportProjectsRoles,
-
-  getOneCompany,
-  exportAllProjectUsers
+  exportUsersInProject,
+  exportAllUsersbyProjects
 };

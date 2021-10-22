@@ -30,5 +30,21 @@ $(document).ready(function () {
   user_table_view.initTable('accountUsersTable')
   user_table_view.initTable('allProjectsUsersTable') 
  
+  $('#btnExportAll').click(async function () {
+    $('#progress_export_allusers').show(); 
+    const accountId = $('#labelAccountId').text()
+    const accountName = $('#labelAccountName').text()
+
+    if(accountId=='' || accountName ==''){
+      alert('please select one account!')
+      $('#progress_export_allusers').hide();  
+      return
+    }
+
+    await user_table_view.exportAllUsersbyProjects(accountId,accountName)
+
+    
+  })
+
 });
 

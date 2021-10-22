@@ -13,9 +13,9 @@ class UserTableView {
       parent:this,
       accountUsersTable: function () {
         return [
-          { field: 'id', title: "id", align: 'center' },
           { field: 'name', title: "name", align: 'center' },
-          { field: 'role', title: "role", align: 'center' },
+          { field: 'role', title: "Access Level", align: 'center' },
+          { field: 'default_role', title: "default_role", align: 'center' },
           { field: 'country', title: "country", align: 'center' },
           { field: 'company_name', title: "company_name", align: 'left' },
           { field: 'email', title: "email", align: 'left' },
@@ -25,7 +25,9 @@ class UserTableView {
           { field: 'website_url', title: "website_url", align: 'left' },
 
           { field: 'created_at', title: "created_at", align: 'left' },
-          { field: 'job_title', title: "job_title", align: 'left' }  
+          { field: 'job_title', title: "job_title", align: 'left' } ,
+          { field: 'id', title: "id", align: 'center' }
+
           ]
       },
 
@@ -33,13 +35,11 @@ class UserTableView {
         return [
           //{ field: 'project', title: "project", align: 'center' },
 
-          { field: 'id', title: "id", align: 'center' },
           { field: 'name', title: "name", align: 'center' },
-          { field: 'autodeskId', title: "autodeskId", align: 'center' },
           { field: 'email', title: "email", align: 'left' },
           { field: 'jobTitle', title: "jobTitle", align: 'left' },
-          { field: 'industry', title: "industry", align: 'left' },
           { field: 'company', title: "company", align: 'left' }, 
+          { field: 'roles', title: "roles", align: 'left',width:100 }, 
 
           { field: 'accessLevels_accountAdmin', title: "accessLevels_accountAdmin", align: 'center' },
           { field: 'accessLevels_projectAdmin', title: "accessLevels_projectAdmin", align: 'left' },
@@ -50,7 +50,10 @@ class UserTableView {
           { field: 'services_costManagement', title: "services_costManagement", align: 'left' },
           { field: 'services_assets', title: "services_assets", align: 'left' },
           { field: 'services_designCollaboration', title: "services_designCollaboration", align: 'left' },
-          { field: 'services_fieldManagement', title: "services_fieldManagement", align: 'left' }
+          { field: 'services_fieldManagement', title: "services_fieldManagement", align: 'left' },
+          { field: 'industry', title: "industry", align: 'left' }, 
+          { field: 'id', title: "id", align: 'center' },  
+          { field: 'autodeskId', title: "autodeskId", align: 'center' }
 
         ]
       }  
@@ -150,6 +153,23 @@ class UserTableView {
       });
     })
   } 
+
+  async exportAllUsersbyProjects(accountId,accountName){
+    var _this = this
+    return new Promise((resolve, reject) => {
+      $.ajax({
+        url: `/api/forge/admin/exportAllUsersbyProjects/${accountId}/${accountName}`,
+        type: 'GET',
+        success: (data) => {
+          //post request, the extraction will start to run on server side
+          //socket will notify the client when it is done
+          resolve(data)
+        }, error: (error) => {
+          reject(error)
+        }
+      });
+    })
+  }
 
   
 
