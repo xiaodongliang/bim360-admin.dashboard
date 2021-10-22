@@ -7,7 +7,8 @@ const SocketEnum = {
 
 };  
 
-socketio = io('http://localhost:3000');
+const HOST_URL =  window.location.host; 
+socketio = io(HOST_URL);
 socketio.on(SocketEnum.DEMO_TOPIC, async (d) => {
   const res = JSON.parse(d)  
   const data  = res.data
