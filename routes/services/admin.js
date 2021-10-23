@@ -99,7 +99,7 @@ async function exportAllUsersbyProjects(accountId) {
 
     let promiseCreator = (async (param) => {
       console.log(param.projectName);
-      await utility.delay(utility.DELAY_MILISECOND)
+      await utility.delay(utility.DELAY_MILISECOND*4)
       var oneProjectUsers = [];
       var pageIndex = 0
       oneProjectUsers = await exportUsersInProject(accountId, param.projectId, param.projectName, 100, 0, oneProjectUsers, pageIndex);
@@ -130,7 +130,7 @@ async function exportUsersInProject(accountid, projectId, projectName, limit, of
     if (response.results && response.results.length > 0) {
       console.log(`getting project ${projectName} users ${offset} to ${offset + limit}`)
       allUsers = allUsers.concat(response.results);
-      //await utility.delay(utility.DELAY_MILISECOND * pageIndex)
+      await utility.delay(utility.DELAY_MILISECOND * pageIndex)
       return exportUsersInProject(accountid, projectId, projectName, limit, allUsers.length, allUsers, pageIndex);
     } else {
 
