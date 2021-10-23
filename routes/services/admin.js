@@ -222,7 +222,7 @@ async function exportProjectsCompanies(accountid, projectId, projectName, limit,
     if (response && response.length > 0) {
       console.log(`getting project ${projectName} companies ${offset} to ${offset + limit}`)
       allCompanies = allCompanies.concat(response);
-      await utility.wait(utility.DELAY_MILISECOND * index)
+      await utility.wait(utility.DELAY_MILISECOND * pageIndex)
       return exportProjectsCompanies(accountid, projectId, projectName, limit, allCompanies.length, allCompanies, pageIndex);
     } else {
 
