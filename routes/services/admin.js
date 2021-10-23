@@ -99,7 +99,7 @@ async function exportAllUsersbyProjects(accountId) {
 
     let promiseCreator = (async (param) => {
       console.log(param.projectName);
-      //await utility.delay(param.index * utility.DELAY_MILISECOND)
+      await utility.delay(param.index * utility.DELAY_MILISECOND)
       var oneProjectUsers = [];
       var pageIndex = 0
       oneProjectUsers = await exportUsersInProject(accountId, param.projectId, param.projectName, 100, 0, oneProjectUsers, pageIndex);
