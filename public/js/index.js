@@ -40,7 +40,7 @@ $(document).ready(function () {
       $('#progress_export_allusers').hide();  
       return
     }
-    $('#completedProIndex').text(''); 
+    $('#completedProIndex').text('started...'); 
     await user_table_view.exportAllUsersbyProjects(accountId,accountName)
 
     
