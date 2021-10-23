@@ -71,7 +71,7 @@ socketio.on(SocketEnum.DEMO_TOPIC, async (d) => {
     break;
     case SocketEnum.EXTRACT_ALL_PROJECT_USERS_STATUS:   
         const completedProIndex = data.index
-        $('#completedProIndex').text(completedProIndex); 
+        $('#completedProIndex').text(`The users of No. ${completedProIndex} project has been exported`); 
 
        console.log('extract all users of all projects status') 
     break;
