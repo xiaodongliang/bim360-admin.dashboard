@@ -99,7 +99,7 @@ async function exportAllUsersbyProjects(accountId) {
 
     let promiseCreator = (async (param) => {
       console.log(param.projectName);
-      await utility.delay(param.index * utility.DELAY_MILISECOND)
+      //await utility.delay(param.index * utility.DELAY_MILISECOND)
       var oneProjectUsers = [];
       var pageIndex = 0
       oneProjectUsers = await exportUsersInProject(accountId, param.projectId, param.projectName, 100, 0, oneProjectUsers, pageIndex);
@@ -135,14 +135,12 @@ async function exportUsersInProject(accountid, projectId, projectName, limit, of
     } else {
 
       const allProjectRoles = await exportProjectsRoles(accountid, projectId, projectName)
+      var allProjectCompanies = []
+      allProjectCompanies = await exportProjectsCompanies(accountid, projectId, projectName,100,0,allProjectCompanies)
 
       //now, sort it out with the explicit data of company name, access level, and accessible services of this user
-      var promiseCreator = async (u) => {
-
-        //let promiseArr = allUsers.map(async (u, index) => {
-        //must delay to avoid to hit rate limit
-        //await utility.delay(utility.DELAY_MILISECOND)
-
+      var promiseCreator = async (u) => { 
+        
         var eachUser = {}
         eachUser.project =  projectName
         eachUser.name = u.name
@@ -154,8 +152,14 @@ async function exportUsersInProject(accountid, projectId, projectName, limit, of
         eachUser.industry = u.industry
 
         eachUser.project = projectName;
-        eachUser.company = u.companyId ? await getOneCompany(accountid, u.companyId) : '';
-        //better use exportProjectsCompanies and find item from the list
+        if(u.companyId)
+        {
+          const find = allProjectCompanies.find(i=>i.id == u.companyId)
+          find? eachUser.company = find.name:''
+
+        }else{
+          eachUser.company = '' 
+        }
 
         eachUser.accessLevels_accountAdmin = u.accessLevels.accountAdmin
         eachUser.accessLevels_projectAdmin = u.accessLevels.projectAdmin
@@ -223,10 +227,7 @@ async function exportProjectsCompanies(accountid, projectId, projectName, limit,
     } else {
 
       //now, sort it out with the explicit data of company name, access level, and accessible services of this user
-      let promiseArr = allCompanies.map(async (c, index) => {
-        //must delay to avoid to hit rate limit
-        await utility.delay(index * utility.DELAY_MILISECOND)
-
+      let promiseArr = allCompanies.map(async (c, index) => { 
         var eachCompany = {}
         eachCompany.project = projectName;
         eachCompany.autodeskId = c.member_group_id // note: the special name for company
