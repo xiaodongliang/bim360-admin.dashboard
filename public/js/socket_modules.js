@@ -4,6 +4,7 @@ const SocketEnum = {
   EXTRACT_ACCOUNT_USERS_DONE:'extract account users done',
   EXTRACT_PROJECT_USERS_DONE:'extract users of one project done',
   EXTRACT_ALL_PROJECT_USERS_DONE:'extract all users of all projects done',
+  EXTRACT_ALL_PROJECT_USERS_STATUS:'extract all users of all projects status',
 
 };  
 
@@ -57,6 +58,8 @@ socketio.on(SocketEnum.DEMO_TOPIC, async (d) => {
        break; 
     case SocketEnum.EXTRACT_ALL_PROJECT_USERS_DONE:   
        $('#progress_export_allusers').hide(); 
+       $('#completedProject').text(''); 
+
        const accountName = data.accountName
        if(data.success){
            window.location = `/api/forge/admin/downloadExcel/${accountName}`; 
@@ -66,6 +69,13 @@ socketio.on(SocketEnum.DEMO_TOPIC, async (d) => {
        console.log('extract all users of all projects done') 
 
     break;
+    case SocketEnum.EXTRACT_ALL_PROJECT_USERS_DONE:   
+        const completedProIndex = data.index
+        $('#completedProIndex').text(completedProIndex); 
+
+       console.log('extract all users of all projects status') 
+    break;
+
     
   }
 

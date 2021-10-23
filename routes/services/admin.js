@@ -95,15 +95,19 @@ async function exportAllUsersbyProjects(accountId) {
         projectName: proj.name,
         index: index
       }
-    }) 
+    })
 
     let promiseCreator = (async (param) => {
       console.log(param.projectName);
-      await utility.delay(utility.DELAY_MILISECOND*4)
+      await utility.delay(utility.DELAY_MILISECOND * 4)
       var oneProjectUsers = [];
       var pageIndex = 0
       oneProjectUsers = await exportUsersInProject(accountId, param.projectId, param.projectName, 100, 0, oneProjectUsers, pageIndex);
-      console.log(`The users of No. ${param.index} project has been exported`); 
+      console.log(`The users of No. ${param.index} project has been exported`);
+      //notify the client with the status 
+      utility.socketNotify(
+        utility.SocketEnum.DEMO_TOPIC,
+        utility.SocketEnum.EXTRACT_ALL_PROJECT_USERS_STATUS, { index: param.index }, '')
       return oneProjectUsers;
     });
 
@@ -137,13 +141,13 @@ async function exportUsersInProject(accountid, projectId, projectName, limit, of
 
       const allProjectRoles = await exportProjectsRoles(accountid, projectId, projectName)
       var allProjectCompanies = []
-      allProjectCompanies = await exportProjectsCompanies(accountid, projectId, projectName,100,0,allProjectCompanies)
+      allProjectCompanies = await exportProjectsCompanies(accountid, projectId, projectName, 100, 0, allProjectCompanies)
 
       //now, sort it out with the explicit data of company name, access level, and accessible services of this user
-      var promiseCreator = async (u) => { 
-        
+      var promiseCreator = async (u) => {
+
         var eachUser = {}
-        eachUser.project =  projectName
+        eachUser.project = projectName
         eachUser.name = u.name
         eachUser.autodeskId = u.autodeskId
         eachUser.id = u.id
@@ -153,13 +157,12 @@ async function exportUsersInProject(accountid, projectId, projectName, limit, of
         eachUser.industry = u.industry
 
         eachUser.project = projectName;
-        if(u.companyId)
-        {
-          const find = allProjectCompanies.find(i=>i.id == u.companyId)
-          find? eachUser.company = find.name:''
+        if (u.companyId) {
+          const find = allProjectCompanies.find(i => i.id == u.companyId)
+          find ? eachUser.company = find.name : ''
 
-        }else{
-          eachUser.company = '' 
+        } else {
+          eachUser.company = ''
         }
 
         eachUser.accessLevels_accountAdmin = u.accessLevels.accountAdmin
@@ -183,7 +186,7 @@ async function exportUsersInProject(accountid, projectId, projectName, limit, of
           eachUser.services_fieldManagement = service_index > -1 ? u.services[service_index].access : 'none'
           service_index = u.services.findIndex(ele => ele.serviceName == 'insight')
           eachUser.services_insight = service_index > -1 ? u.services[service_index].access : 'none'
-        } 
+        }
 
         //orgnize the string of roles
         if (u.roleIds && u.roleIds.length > 0) {
@@ -228,7 +231,7 @@ async function exportProjectsCompanies(accountid, projectId, projectName, limit,
     } else {
 
       //now, sort it out with the explicit data of company name, access level, and accessible services of this user
-      let promiseArr = allCompanies.map(async (c, index) => { 
+      let promiseArr = allCompanies.map(async (c, index) => {
         var eachCompany = {}
         eachCompany.project = projectName;
         eachCompany.autodeskId = c.member_group_id // note: the special name for company

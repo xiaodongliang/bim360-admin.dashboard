@@ -14,13 +14,15 @@ function setDelay(interval){
    DELAY_MILISECOND = interval
 }
 
-
 const SocketEnum = {
   DEMO_TOPIC: 'demo topic',
   EXTRACT_ACCOUNT_USERS_DONE:'extract account users done',
   EXTRACT_PROJECT_USERS_DONE:'extract users of one project done',
-  EXTRACT_ALL_PROJECT_USERS_DONE:'extract all users of all projects done', 
+  EXTRACT_ALL_PROJECT_USERS_DONE:'extract all users of all projects done',
+  EXTRACT_ALL_PROJECT_USERS_STATUS:'extract all users of all projects status',
+
 };  
+
 function socketNotify(topic,message,data,info){
   //notify client
   var sockketData = {message:message,data:data,info:info} 
