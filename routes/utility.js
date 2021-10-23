@@ -8,7 +8,7 @@ const Excel_Exports = './Excel_Exports/'
 if(!fs.existsSync(Excel_Exports))
   mkdir.mkdirp(Excel_Exports,(err)=>{if(!err)console.log('folder ./Excel_Exports/ is created')})
 
-var DELAY_MILISECOND = 1000; 
+var DELAY_MILISECOND = 500; 
 
 function setDelay(interval){
    DELAY_MILISECOND = interval
