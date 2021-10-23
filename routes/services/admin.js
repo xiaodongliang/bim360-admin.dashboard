@@ -103,6 +103,7 @@ async function exportAllUsersbyProjects(accountId) {
       var oneProjectUsers = [];
       var pageIndex = 0
       oneProjectUsers = await exportUsersInProject(accountId, param.projectId, param.projectName, 100, 0, oneProjectUsers, pageIndex);
+      console.log(`The users of No. ${param.index} project has been exported`); 
       return oneProjectUsers;
     });
 
