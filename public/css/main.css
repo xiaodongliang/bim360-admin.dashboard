@@ -29,6 +29,12 @@ body {
   height: 30%;
 }
 
+.InProgressImg_export{
+  width: 10%;
+  height: 10%;
+}
+
+
 .withBoard{
   border:1px solid silver;  
   height: 45vh; 

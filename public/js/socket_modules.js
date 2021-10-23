@@ -58,7 +58,7 @@ socketio.on(SocketEnum.DEMO_TOPIC, async (d) => {
        break; 
     case SocketEnum.EXTRACT_ALL_PROJECT_USERS_DONE:   
        $('#progress_export_allusers').hide(); 
-       $('#completedProject').text(''); 
+       $('#completedProIndex').text(''); 
 
        const accountName = data.accountName
        if(data.success){
